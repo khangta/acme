@@ -1,6 +1,7 @@
 {
     "name": "vendor/khangta",
     "description": "Description of project acme.",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "USER",
