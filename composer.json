@@ -8,6 +8,6 @@
         }
     ],
     "require": {
-        "khangta/acme": "*"
+        "monolog/monolog": "1.20
     }
 }
