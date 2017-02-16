@@ -1,0 +1,13 @@
+{
+    "name": "vendor/khangta",
+    "description": "Description of project acme.",
+    "authors": [
+        {
+            "name": "USER",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "khangta/acme": "*"
+    }
+}
