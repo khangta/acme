@@ -8,6 +8,10 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "monolog/monolog": "1.20"
+=======
+        "khangta/acme": "*"
+>>>>>>> 96664e6ac48ac04f706ae4f426f909c0824e67b7
     }
 }
