@@ -11,3 +11,5 @@ class Str
 $str = new Str();
 echo $str->toString();
 
+//
+
