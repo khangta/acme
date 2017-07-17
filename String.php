@@ -11,4 +11,4 @@ class Str
 $str = new Str();
 echo $str->toString();
 
-// Test v1.0
+// Test v1.5
