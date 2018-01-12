@@ -10,4 +10,5 @@ class Str
 
 $str = new Str();
 echo $str->toString();
-var_dump($str);
+
+// Test 
