@@ -21,8 +21,6 @@ class ImageCaptcha
 
     public $lineColor = array(125, 125, 125);
 
-    public $arcLineColor = array(125, 125, 125);
-
     /** Foreground colors in RGB-array */
     public $textColors = array(
         array(27, 78, 181), // blue
@@ -30,13 +28,6 @@ class ImageCaptcha
         array(214, 36, 7), // red
         array(99, 0, 0),
         array(66, 66, 66),
-    );
-
-    /** Foreground colors in RGB-array */
-    public $fakeTextColors = array(
-        array(185, 185, 185),
-        array(255, 185, 185),
-        array(185, 185, 255),
     );
 
     /** Shadow color in RGB-array or null */
@@ -54,19 +45,13 @@ class ImageCaptcha
      * - maxSize: max font size
      */
     public $fonts = array(
-        //'Antykwa'  => array('spacing' => -3, 'minSize' => 27, 'maxSize' => 30, 'font' => 'AntykwaBold.ttf'),
         'Candice'  => array('spacing' =>- 1.5,'minSize' => 20, 'maxSize' => 24, 'font' => 'Candice.ttf'),
         'DingDong' => array('spacing' => -2, 'minSize' => 20, 'maxSize' => 24, 'font' => 'Ding-DongDaddyO.ttf'),
-        //'Duality'  => array('spacing' => -2, 'minSize' => 20, 'maxSize' => 22, 'font' => 'Duality.ttf'),
-        ////'Heineken' => array('spacing' => -2, 'minSize' => 24, 'maxSize' => 34, 'font' => 'Heineken.ttf'),     // Can not display number
-        //'Jura' => array('spacing' => -2, 'minSize' => 28, 'maxSize' => 32, 'font' => 'Jura.ttf'),
-        //'StayPuft' => array('spacing' => -1.5, 'minSize' => 28, 'maxSize' => 32, 'font' => 'StayPuft.ttf'),
         'Times' => array('spacing' => -2, 'minSize' => 20, 'maxSize' => 26, 'font' => 'TimesNewRomanBold.ttf'),
         'VeraSans' => array('spacing' => -1, 'minSize' => 18, 'maxSize' => 22, 'font' => 'VeraSansBold.ttf'),
     );
 
     public $textColor = null; //array(0, 0, 0);
-    public $fakeTextColor = null; //array(0, 0, 0);
 
     /** Wave configuracion in X and Y axes */
     //public $Xperiod = 11;
@@ -124,8 +109,8 @@ class ImageCaptcha
         /** Initialization */
         $this->imageAllocate();
 
-        $this->waveImage();
-
+        $this->waveImage(0, 100, 1, 3, 1, 2);
+        
         /** Text insertion */
         $text = $this->randomText; //$this->getRandomText();
         $fontCfg = $this->fonts[array_rand($this->fonts)];
@@ -138,8 +123,8 @@ class ImageCaptcha
             $this->writeOverTextLine();
         }
 
-        $this->waveImage2();
-
+        $this->waveImage(100, 100, 2, 3, 2, 2);
+        
         if ($this->blur && function_exists('imagefilter')) {
             imagefilter($this->img, IMG_FILTER_GAUSSIAN_BLUR);
         }
@@ -149,7 +134,7 @@ class ImageCaptcha
         if ($this->debug) {
             imagestring($this->img, 1, 1, $this->height - 8, "$text {$fontCfg['font']} " . round((microtime(true) - $ini) * 1000) . "ms", $this->textColor);
         }
-
+                
         /** Output */
         $this->writeImage();
         $this->cleanup();
@@ -165,18 +150,18 @@ class ImageCaptcha
         }
 
         $this->img = imagecreatetruecolor($this->width * $this->scale, $this->height * $this->scale);
+        
+        // Prepare alpha channel for transparent background
+//        $alphaChannel = imagecolorallocatealpha($this->img, 0, 0, 0, 127); 
+//        $this->img = imagecolortransparent($this->img, $alphaChannel); 
 
         // Background color
         $backgroundColor = imagecolorallocate($this->img, $this->backgroundColor[0], $this->backgroundColor[1], $this->backgroundColor[2]);
         $this->gdBgColor = imagefilledrectangle($this->img, 0, 0, $this->width * $this->scale, $this->height * $this->scale, $backgroundColor);
-
+        
         // Foreground color
         $textColor = $this->textColors[mt_rand(0, sizeof($this->textColors) - 1)];
         $this->textColor = imagecolorallocate($this->img, $textColor[0], $textColor[1], $textColor[2]);
-
-        // Fake text color
-        $fakeTextColor = $this->fakeTextColors[mt_rand(0, sizeof($this->fakeTextColors) - 1)];
-        $this->fakeTextColor = imagecolorallocate($this->img, $fakeTextColor[0], $fakeTextColor[1], $fakeTextColor[2]);
 
         // Shadow color
         if (!empty($this->shadowColor) && is_array($this->shadowColor) && sizeof($this->shadowColor) >= 3) {
@@ -190,10 +175,10 @@ class ImageCaptcha
             $length = rand($this->minWordLength, $this->maxWordLength);
         }
 
-        $words = "abcdefghijlmnopqrstvwyz123456789"; //ABCDEFGHIJKLMNOPQRSTUVXYZ";
-        $vocals = "aeiou";
+        $words = 'abcdefghijlmnopqrstvwyz123456789'; //ABCDEFGHIJKLMNOPQRSTUVXYZ";
+        $vocals = 'aeiou';
 
-        $text = "";
+        $text = '';
         $vocal = rand(0, 1);
         for ($i = 0; $i < $length; $i++) {
             if ($vocal) {
@@ -245,38 +230,59 @@ class ImageCaptcha
     /**
      * Wave filter
      */
-    protected function waveImage()
+    protected function waveImage($kRnd1 = 0, $kRnd2 = 100, $xRnd1 = 1, $xRnd2 = 3, $yRnd1 = 1, $yRnd2 = 3)
     {
         // X-axis wave generation
-        $xp = $this->scale * $this->Xperiod * rand(1, 3);
-        $k = rand(0, 100);
+        $xp = $this->scale * $this->Xperiod * rand($xRnd1, $xRnd2);
+        $k = rand($kRnd1, $kRnd2);
         for ($i = 0; $i < ($this->width * $this->scale); $i++) {
             imagecopy($this->img, $this->img, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->Xamplitude), $i, 0, 1, $this->height * $this->scale);
         }
 
         // Y-axis wave generation
-        $k = rand(0, 100);
-        $yp = $this->scale * $this->Yperiod * rand(1, 2);
+        $k = rand($kRnd1, $kRnd2);
+        $yp = $this->scale * $this->Yperiod * rand($yRnd1, $yRnd2);
         for ($i = 0; $i < ($this->height * $this->scale); $i++) {
             imagecopy($this->img, $this->img, sin($k + $i / $yp) * ($this->scale * $this->Yamplitude), $i - 1, 0, $i, $this->width * $this->scale, 1);
         }
     }
-
-    protected function waveImage2()
+    
+    /**
+     * Line over the text
+     */
+    protected function writeOverTextLine()
     {
-        // X-axis wave generation
-        $xp = $this->scale * $this->Xperiod * rand(3, 3);
-        $k = rand(100, 100);
-        for ($i = 0; $i < ($this->width * $this->scale); $i++) {
-            imagecopy($this->img, $this->img, $i - 1, sin($k + $i / $xp) * ($this->scale * $this->Xamplitude), $i, 0, 1, $this->height * $this->scale);
+        $x1 = $this->width * $this->scale * 0.15;
+        $x2 = $this->textFinalX;
+        $y1 = rand($this->height * $this->scale * 0.40, $this->height * $this->scale * 0.65);
+        $y2 = rand($this->height * $this->scale * 0.40, $this->height * $this->scale * 0.65);
+        $width = $this->lineWidth / 2 * $this->scale;
+
+        for ($i = $width * -1; $i <= $width; $i++) {
+            imageline($this->img, $x1, $y1 + $i, $x2, $y2 + $i, $this->textColor);
+        }
+    }
+    
+    /**
+     * Grid on the background
+     */
+    protected function writeLines()
+    {
+        $lineColor = imagecolorallocate($this->img, $this->lineColor[0], $this->lineColor[1], $this->lineColor[2]);
+        imagesetthickness($this->img, 1);
+
+        //vertical lines
+        for ($x = 0; $x < $this->width; $x += 10) {
+            imageline($this->img, $x, 0, $x, $this->height, $lineColor);
+        }
+        imageline($this->img, $this->width - 1, 0, $this->width - 1, $this->height, $lineColor);
+
+        //horizontal lines
+        for ($y = 0; $y < $this->height; $y += 10) {
+            imageline($this->img, 0, $y, $this->width, $y, $lineColor);
         }
 
-        // Y-axis wave generation
-        $k = rand(100, 100);
-        $yp = $this->scale * $this->Yperiod * rand(2, 2);
-        for ($i = 0; $i < ($this->height * $this->scale); $i++) {
-            imagecopy($this->img, $this->img, sin($k + $i / $yp) * ($this->scale * $this->Yamplitude), $i - 1, 0, $i, $this->width * $this->scale, 1);
-        }
+        imageline($this->img, 0, $this->height -1, $this->width, $this->height -1, $lineColor);
     }
 
     /**
@@ -287,6 +293,13 @@ class ImageCaptcha
         $imgResampled = imagecreatetruecolor($this->width, $this->height);
         imagecopyresampled($imgResampled, $this->img, 0, 0, 0, 0, $this->width, $this->height, $this->width * $this->scale, $this->height * $this->scale);
         imagedestroy($this->img);
+        
+//        $imgBackground = imagecreatetruecolor($this->width, $this->height);
+//        $this->img = $imgBackground;
+//        $backgroundColor = imagecolorallocate($this->img, $this->backgroundColor[0], $this->backgroundColor[1], $this->backgroundColor[2]);
+//        $this->gdBgColor = imagefilledrectangle($this->img, 0, 0, $this->width * $this->scale, $this->height * $this->scale, $backgroundColor);
+//        $this->writeLines();
+        
         $this->img = $imgResampled;
     }
 
