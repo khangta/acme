@@ -1,6 +1,6 @@
 <?php
 
-namespace Captcha;
+namespace Khangta\Acme\Captcha;
 
 class ImageCaptcha
 {
