@@ -1,0 +1,22 @@
+{
+    "name": "captcha",
+    "description": "Captcha",
+    "keywords": ["captcha"],
+    "license": "MIT",
+    "authors": [
+        {
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Captcha\\": "src/"
+        },
+        "files": [
+        ]
+    },
+    "extra": {
+    }
+}

@@ -1,7 +1,7 @@
 {
-    "name": "captcha",
-    "description": "Captcha",
-    "keywords": ["captcha"],
+    "name": "math",
+    "description": "Math",
+    "keywords": ["math"],
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Captcha\\": "src/"
+            "Acme\\Math\\": "src/"
         },
         "files": [
         ]

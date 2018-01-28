@@ -8,7 +8,15 @@
             "email": "your@email.here"
         }
     ],
-    "require": {
-        "monolog/monolog": "1.20"
+    "autoload": {
+        "psr-4": {
+            "Acme\\": "src/"
+        },
+        "files": [
+        ]
+    },
+    "replace": {
+        "Acme/Captcha": "self.version",
+        "Acme/Math": "self.version"
     }
 }
