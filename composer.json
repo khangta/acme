@@ -1,7 +1,7 @@
 {
     "name": "khangta/acme",
     "description": "Description of project acme.",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "authors": [
         {
             "name": "USER",
@@ -16,7 +16,6 @@
         ]
     },
     "replace": {
-        "Acme/Captcha": "self.version",
         "Acme/Math": "self.version"
     }
 }
